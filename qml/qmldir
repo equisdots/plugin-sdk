@@ -1,0 +1,5 @@
+module equisdots.pluginsdk
+singleton SdkVersion 1.0 SdkVersion.qml
+singleton Settings 1.0 Settings.qml
+SettingsScope 1.0 SettingsScope.qml
+PluginHost 1.0 PluginHost.qml

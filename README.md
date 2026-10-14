@@ -28,6 +28,31 @@ standard's narrative lives in `equisdots/plugins → docs/plugins.md`.
 - Plugins use the injected handle and the public kit:
   `required property PluginHost host` + `import qs.ui.sdk`.
 
+### Host factory (shell side)
+
+The shell builds **one `PluginHost` per plugin** and injects it as an initial
+property when it loads the host adapter (`ui/PluginHosts.qml`) and the settings
+page (`BarEditor`) — the same instance for both:
+
+```qml
+Loader.setSource(url, { host: HostApi.forPlugin(entry) })
+```
+
+`HostApi.forPlugin` constructs a `PluginHost` bound to the shell's `Colors`,
+`Caching`, `PluginsCatalog` and scale function (see the required properties on
+`PluginHost.qml`). Plugins then write:
+
+```qml
+required property PluginHost host
+// host.color("mauve", "#cba6f7") · host.s(12) · host.settings.set("x", 1) · host.exec("...")
+```
+
+The compositor half (`lua/equisdots.lua`) mirrors this by injecting the `mod`
+table into each plugin's `hypr.lua`.
+
+> Status: the types + Lua SDK are in place; the shell factory and the consumer
+> migration are the next step (validated on a live session).
+
 ## Status
 
 Work in progress on `branch/experimental` (mirrors the branch name used across

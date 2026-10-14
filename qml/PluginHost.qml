@@ -1,0 +1,52 @@
+import QtQuick
+import Quickshell
+import "."
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PluginHost — the per-plugin handle injected into a plugin's host adapter and
+// settings page (the shell-side analogue of the compositor's `mod` table).
+//
+// A plugin root declares:   required property PluginHost host
+// The host factory (shell side) constructs it with the shell services bound to
+// the required properties below. Plugins never import shell internals.
+// ═══════════════════════════════════════════════════════════════════════════
+
+QtObject {
+    id: host
+
+    required property var manifest      // the scan entry (id, _base, scope, provides, ...)
+    required property var colors        // Colors-like: semantic role properties
+    required property var caching       // Caching-like: cacheDir/stateDir/runDir/logDir
+    required property var catalog       // PluginsCatalog-like: plugins, rev, uiPath()
+    property var scaleFn: null          // function(v) -> real (the editor scale)
+    property var settingsSource: null   // defaults to the Settings singleton
+
+    readonly property string id: (manifest && manifest.id !== undefined) ? String(manifest.id) : ""
+    readonly property string dir: (manifest && manifest._base !== undefined) ? String(manifest._base) : ""
+    readonly property string apiVersion: SdkVersion.version
+
+    readonly property string scopeName: (manifest && manifest.scope !== undefined)
+        ? String(manifest.scope) : ("plugins." + id)
+
+    readonly property SettingsScope settings: SettingsScope { scope: host.scopeName }
+
+    readonly property var screens: Quickshell.screens
+
+    function color(role, fallback) {
+        if (typeof role === "string" && role.length > 0) {
+            if (role.charAt(0) === "#") return role;
+            if (colors && colors[role] !== undefined) return colors[role];
+        }
+        return fallback;
+    }
+    function s(v) { return scaleFn ? scaleFn(v) : v; }
+
+    function script(name) { return dir + "/scripts/" + String(name); }
+    function cacheDir(name) { return caching ? caching.getCacheDir(name || id) : ""; }
+    function stateDir(name) { return caching ? caching.getStateDir(name || id) : ""; }
+    function runDir(name) { return caching ? caching.getRunDir(name || id) : ""; }
+    function logDir(name) { return caching ? caching.getLogDir(name || id) : ""; }
+
+    function exec(cmd) { Quickshell.execDetached(["bash", "-lc", String(cmd)]); }
+    function log(msg) { console.log("[plugin:" + id + "] " + msg); }
+}
