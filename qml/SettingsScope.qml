@@ -16,7 +16,14 @@ Scope {
 
     required property string scope
 
-    readonly property var section: Settings.section(scope)
+    // Read Settings.data directly in the binding (a function call into the
+    // singleton does not reliably establish the dependency, so `section` would
+    // go stale). Returns {} for a missing/absent scope.
+    readonly property var section: {
+        let d = Settings.data;
+        let v = (d && typeof d === "object") ? d[scope] : undefined;
+        return (v !== null && v !== undefined && typeof v === "object" && !Array.isArray(v)) ? v : {};
+    }
     readonly property bool ready: Settings.ready
     readonly property int revision: Settings.revision
 
@@ -31,6 +38,7 @@ Scope {
 
     function get(key, fallback) { return Settings.get(scope.scope + "." + key, fallback); }
     function has(key) { return Settings.has(scope.scope + "." + key); }
+    function all() { return Settings.section(scope.scope); }
     function set(key, value) { Settings.set(scope.scope + "." + key, value); }
     function unset(key) { Settings.set(scope.scope + "." + key, null); }
     function setMany(patch, immediate) { let w = {}; w[scope.scope] = patch; Settings.setMany(w, immediate); }

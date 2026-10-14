@@ -18,12 +18,20 @@ QtObject {
     required property var colors        // Colors-like: semantic role properties
     required property var caching       // Caching-like: cacheDir/stateDir/runDir/logDir
     required property var catalog       // PluginsCatalog-like: plugins, rev, uiPath()
+    required property var widgetsSource // WindowRegistry.js module (getLayout/getScale)
+    required property var statsSource   // SysData singleton (cpu/ramPercent/temp/subscribe)
     property var scaleFn: null          // function(v) -> real (the editor scale)
     property var settingsSource: null   // defaults to the Settings singleton
 
     readonly property string id: (manifest && manifest.id !== undefined) ? String(manifest.id) : ""
     readonly property string dir: (manifest && manifest._base !== undefined) ? String(manifest._base) : ""
     readonly property string apiVersion: SdkVersion.version
+
+    readonly property string home: Quickshell.env("HOME")
+    readonly property string settingsPath: home + "/.config/hypr/settings.json"
+
+    readonly property var widgets: widgetsSource
+    readonly property var stats: statsSource
 
     readonly property string scopeName: (manifest && manifest.scope !== undefined)
         ? String(manifest.scope) : ("plugins." + id)
@@ -42,6 +50,9 @@ QtObject {
     function s(v) { return scaleFn ? scaleFn(v) : v; }
 
     function script(name) { return dir + "/scripts/" + String(name); }
+    // Read-only access to settings OUTSIDE the plugin's own scope (e.g. the
+    // shell's uiScale / bar). Writes stay scoped.
+    function global(path, fallback) { return Settings.get(path, fallback); }
     function cacheDir(name) { return caching ? caching.getCacheDir(name || id) : ""; }
     function stateDir(name) { return caching ? caching.getStateDir(name || id) : ""; }
     function runDir(name) { return caching ? caching.getRunDir(name || id) : ""; }
