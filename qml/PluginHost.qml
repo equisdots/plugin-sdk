@@ -21,14 +21,18 @@ QtObject {
     required property var widgetsSource // WindowRegistry.js module (getLayout/getScale)
     required property var statsSource   // SysData singleton (cpu/ramPercent/temp/subscribe)
     property var scaleFn: null          // function(v) -> real (the editor scale)
-    property var settingsSource: null   // defaults to the Settings singleton
+    property var settingsStore: null    // the plugin's OWN SettingsStore (its own settings.json)
+    property var settingsSource: null   // (legacy alias; prefer settingsStore)
 
     readonly property string id: (manifest && manifest.id !== undefined) ? String(manifest.id) : ""
     readonly property string dir: (manifest && manifest._base !== undefined) ? String(manifest._base) : ""
     readonly property string apiVersion: SdkVersion.version
 
     readonly property string home: Quickshell.env("HOME")
-    readonly property string settingsPath: home + "/.config/hypr/settings.json"
+    readonly property string settingsPath: home + "/.config/hypr/settings.json"   // legacy alias (core)
+    // The plugin's OWN settings file — its state lives here, never mixed into
+    // the core settings.json (autonomy).
+    readonly property string settingsFilePath: dir !== "" ? (dir + "/settings.json") : ""
 
     readonly property var widgets: widgetsSource
     readonly property var stats: statsSource
@@ -36,7 +40,10 @@ QtObject {
     readonly property string scopeName: (manifest && manifest.scope !== undefined)
         ? String(manifest.scope) : ("plugins." + id)
 
-    readonly property SettingsScope settings: SettingsScope { scope: host.scopeName }
+    readonly property SettingsScope settings: SettingsScope {
+        scope: host.scopeName
+        store: host.settingsStore !== null ? host.settingsStore : Settings
+    }
 
     readonly property var screens: Quickshell.screens
 
