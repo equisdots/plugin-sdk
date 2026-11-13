@@ -1,0 +1,9 @@
+equisdots/plugin-sdk
+Copyright (C) 2026 xscriptor <x@xscriptor.com>
+SPDX-License-Identifier: Apache-2.0
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+Releases published before 2026-11-13 were distributed under the MIT License and remain available under those terms.
+
+Third-party components, fonts, icons, images, sounds, vendored code and other assets keep their original licenses and are not covered by this license. See THIRD-PARTY.md / CREDITS.md where present.

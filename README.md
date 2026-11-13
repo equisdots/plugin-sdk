@@ -60,4 +60,12 @@ the equisdots repositories).
 
 ## License
 
-MIT — see `LICENSE`.
+Apache-2.0 — see [LICENSE](LICENSE). Copyright (C) 2026 xscriptor <x@xscriptor.com>.
+
+Licensed under the Apache License, Version 2.0. You may use, modify and distribute it under the terms of that license.
+
+Releases published before 2026-11-13 were distributed under the MIT License and remain available under those terms.
+
+Third-party components, fonts, icons, images, sounds, vendored code and other assets keep their original licenses and are not covered by this license. See THIRD-PARTY.md / CREDITS.md where present.
+
+Third-party plugins may use this SDK/API under Apache-2.0 and keep their own license for the plugin; the shell grants the plugin exception.
